@@ -1,4 +1,6 @@
 import UIKit
+import EntrigSDK
+import UserNotifications
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
@@ -14,6 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // Entrig: Setup push notification handling
+    UNUserNotificationCenter.current().delegate = self
+    Entrig.checkLaunchNotification(launchOptions)
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -30,6 +36,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     )
 
     return true
+  }
+
+  // MARK: - Entrig Push Notification Handling
+
+  func application(_ application: UIApplication,
+      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    Entrig.didRegisterForRemoteNotifications(deviceToken: deviceToken)
+  }
+
+  func application(_ application: UIApplication,
+      didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    Entrig.didFailToRegisterForRemoteNotifications(error: error)
+  }
+
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                               willPresent notification: UNNotification,
+                               withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    Entrig.willPresentNotification(notification)
+    completionHandler(Entrig.getPresentationOptions())
+  }
+
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                               didReceive response: UNNotificationResponse,
+                               withCompletionHandler completionHandler: @escaping () -> Void) {
+    Entrig.didReceiveNotification(response)
+    completionHandler()
   }
 }
 

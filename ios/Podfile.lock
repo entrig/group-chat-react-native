@@ -1,4 +1,8 @@
 PODS:
+  - EntrigReactNative (1.0.1):
+    - EntrigSDK (= 1.0.0)
+    - React-Core
+  - EntrigSDK (1.0.0)
   - FBLazyVector (0.84.0)
   - hermes-engine (250829098.0.7):
     - hermes-engine/Pre-built (= 250829098.0.7)
@@ -1972,6 +1976,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - "EntrigReactNative (from `../node_modules/@entrig/react-native`)"
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -2052,7 +2057,13 @@ DEPENDENCIES:
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
+SPEC REPOS:
+  trunk:
+    - EntrigSDK
+
 EXTERNAL SOURCES:
+  EntrigReactNative:
+    :path: "../node_modules/@entrig/react-native"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   hermes-engine:
@@ -2212,6 +2223,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  EntrigReactNative: b6b0aa2d8dbd1c0323b9dbf4f102c2a52fdf6d26
+  EntrigSDK: 4e5342e80f3bffb4008f497221ffa007d147ffe8
   FBLazyVector: c12d2108050e27952983d565a232f6f7b1ad5e69
   hermes-engine: 74bcccb0320647e58386a6f3d74c382b8121dc32
   RCTDeprecation: 3280799c14232a56e5a44f92981a8ee33bc69fd9
