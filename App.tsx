@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StatusBar, StyleSheet, View } from "react-native";
 import {
   NavigationContainer,
@@ -21,22 +21,55 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [entrigInitialized, setEntrigInitialized] = useState(false);
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(
     null,
   );
+  const pendingNotificationRef = useRef<NotificationEvent | null>(null);
+  const sessionRef = useRef<Session | null>(null);
+  const isNavigationReadyRef = useRef(false);
 
-  const handleNotification = (event: NotificationEvent) => {
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
+
+  useEffect(() => {
+    isNavigationReadyRef.current = isNavigationReady;
+  }, [isNavigationReady]);
+
+  const handleNotification = useCallback((event: NotificationEvent) => {
+    if (!event) {
+      return;
+    }
+
+    if (!sessionRef.current || !isNavigationReadyRef.current) {
+      pendingNotificationRef.current = event;
+      return;
+    }
+
     const type = event?.type;
     const data = event.data;
     switch (type) {
       case "new_message":
+        const group = data.$_group_id;
         navigationRef.current?.navigate("Chat", {
-          id: data["group_id"],
-          name: data["group_name"],
+          id: group.id,
+          name: group.name,
         });
         break;
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const pendingEvent = pendingNotificationRef.current;
+
+    if (!pendingEvent || !session || !isNavigationReady) {
+      return;
+    }
+
+    pendingNotificationRef.current = null;
+    handleNotification(pendingEvent);
+  }, [handleNotification, session, isNavigationReady]);
 
   // Initialize Entrig
   useEffect(() => {
@@ -64,7 +97,7 @@ export default function App() {
     };
 
     initEntrig();
-  }, []);
+  }, [handleNotification]);
 
   // Handle auth state and Entrig registration
   useEffect(() => {
@@ -97,7 +130,12 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        setIsNavigationReady(true);
+      }}
+    >
       <StatusBar barStyle="dark-content" />
       <Stack.Navigator>
         {!session
